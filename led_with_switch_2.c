@@ -15,7 +15,7 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
-int switch_var;		// To save state of LED (ON/OFF)
+volatile int switch_var;		// To save state of LED (ON/OFF)
 
 
 static void led_init(void)
