@@ -1,8 +1,9 @@
 /*
  * Arduino_Uno.c
  *
- * Created: 30.11.2019 17:42:13
+ * Created: 17.12.2019 18:00:00
  * Author : Jan
+ * This program changes the state of an LED (ON/OFF) by pressing a button. Releasing the button does not change the state!
  */ 
 
 #define F_CPU 16000000L // Specify oscillator frequency; Needed for _delay_ms()
