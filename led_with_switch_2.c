@@ -11,13 +11,11 @@
  * --> Pin 12 --> Button --> GND
  */ 
 
-#define F_CPU 16000000L // Specify oscillator frequency; Needed for _delay_ms()
-#include <avr/io.h>		// The two header files come with the drivers for the Arduino
-#include <util/delay.h>	// They include the _delay_ms() function and some defines (Right click --> Go to implementation)
+#include <avr/io.h>		// The header files come with the drivers for the Arduino
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
-int switch_var;
+int switch_var;		// To save state of LED (ON/OFF)
 
 
 static void led_init(void)
@@ -32,28 +30,26 @@ static void button_init(void)
 	
 	PINB |= (1 << 4);	// Pull input Pin at 5V as default
 	
-	PCICR |= (1 << PCIE0);	// enables Pin Change 0 interrupt (that's some special kind of interrupt); PCICR = Pin Change Interrupt Control Register; see OneNote for details
+	PCICR |= (1 << PCIE0);	// PCICR = Pin Change Interrupt Control Register; see OneNote for details, short: selects which Port is used for the interrupt
 	PCMSK0 |= (1 << PCINT4);	// makes Pin 4 to interrupt pin; PCMSK = Pin Change Enable Mask Register 
 }
 
 
-int led_on(void)
+void led_on(void)
 {
 	PORTB |= (1 << 2);
 	switch_var = 1;
-	return switch_var;
 }
 
 
-int led_off(void)
+void led_off(void)
 {
 	PORTB &= ~(1 << 2);
 	switch_var = 0;
-	return switch_var;
 }
 
 
-void switch_led_status(switch_var)
+void switch_led_status(int switch_var)
 {
 	if (switch_var == 0)	// LED is OFF
 	{
