@@ -1,5 +1,5 @@
 /*
- * Arduino_Uno.c
+ * blink_led.c
  *
  * Created: 30.11.2019 17:42:13
  * Author : Jan

@@ -1,5 +1,5 @@
 /*
- * Arduino_Uno.c
+ * led_with_switch_2.c
  *
  * Created: 17.12.2019 18:00:00
  * Author : Jan
