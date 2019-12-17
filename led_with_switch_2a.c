@@ -37,7 +37,7 @@ ISR(PCINT0_vect) /* pin change interrupt service routine */
 {
 	if (!(PINB & (1 << 4)))	// Button pressed
 	{
-		PORTB ^= (1 << 2);	// XOR operation; changes state of bit
+		PORTB ^= (1 << 2);	// bitwise XOR operation; changes state of bit
 	}
 }
 
