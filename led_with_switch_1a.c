@@ -5,7 +5,11 @@
  * Author : Jan
  * This program turns on an LED when a switch is pressed
  * Same as other program but this time with a Interrupt Routine!
- */ 
+ *
+ * Connections:
+ * --> LED to Pin 10 on Arduino
+ * --> Pin 12 --> Button --> GND
+ */
 
 #define F_CPU 16000000L // Specify oscillator frequency; Needed for _delay_ms()
 #include <avr/io.h>		// The two header files come with the drivers for the Arduino

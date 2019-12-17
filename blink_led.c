@@ -3,6 +3,8 @@
  *
  * Created: 30.11.2019 17:42:13
  * Author : Jan
+ *
+ * Connect LED to Pin 10 on Arduino
  */ 
 
 #define F_CPU 16000000L // Specify oscillator frequency; Needed for _delay_ms()

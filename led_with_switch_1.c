@@ -4,6 +4,10 @@
  * Created: 08.12.2019 21:44:00
  * Author : Jan
  * This program turns on an LED when a switch is pressed
+ *
+ * Connections:
+ * --> LED to Pin 10 on Arduino
+ * --> Pin 12 --> Button --> GND
  */ 
 
 #define F_CPU 16000000L // Specify oscillator frequency; Needed for _delay_ms()
