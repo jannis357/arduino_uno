@@ -17,11 +17,14 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
+int switch_var;
+
 
 static void led_init(void)
 {
 	DDRB = (1 << 2); // Configures Pin 2 of PORTB as output (should be Pin 10 on arduino); Code: 1 gets shifted by 2
 }
+
 
 static void button_init(void)
 {
@@ -29,41 +32,55 @@ static void button_init(void)
 	
 	PINB |= (1 << 4);	// Pull input Pin at 5V as default
 	
-	PCICR |= (1 << PCIE0);	// enables Pin Change 0 interrupt
-	PCMSK0 |= (1 << PCINT4);	// makes Pin 4 to interrupt pin
+	PCICR |= (1 << PCIE0);	// enables Pin Change 0 interrupt (that's some special kind of interrupt); PCICR = Pin Change Interrupt Control Register; see OneNote for details
+	PCMSK0 |= (1 << PCINT4);	// makes Pin 4 to interrupt pin; PCMSK = Pin Change Enable Mask Register 
 }
 
-static void led_on(void)
+
+int led_on(void)
 {
 	PORTB |= (1 << 2);
+	switch_var = 1;
+	return switch_var;
 }
 
 
-static void led_off(void)
+int led_off(void)
 {
 	PORTB &= ~(1 << 2);
+	switch_var = 0;
+	return switch_var;
 }
 
-ISR(PCINT0_vect) /* pin change interrupt service routine */
+
+void switch_led_status(switch_var)
 {
-	if (PINB & (1 << 4))	// If input pin is at 5V (default state) --> Output is OFF
-	{
-		led_off();
-	}
-	
-	if (!(PINB & (1 << 4)))	// If input pin is pulled down to 0V (via the physical switch) --> Output is ON
+	if (switch_var == 0)	// LED is OFF
 	{
 		led_on();
 	}
+	
+	if (switch_var == 1)	// LED is ON
+	{
+		led_off();
+	}
 }
 
 
+ISR(PCINT0_vect) /* pin change interrupt service routine */
+{
+	if (!(PINB & (1 << 4)))	// Button pressed
+	{
+		switch_led_status(switch_var);
+	}
+}
 
 
 int main(void)
 {
 	led_init();
 	button_init();
+	led_off();
 	sei();	// enables interrupts globally
 	
 	while (1)
