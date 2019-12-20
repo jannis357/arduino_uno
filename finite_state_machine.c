@@ -5,7 +5,7 @@
  * Author : Jan
  *
  * Simple cyclic finite state machine (FSM) with an LED
- * Uses Interrupts to 'sense' the state change
+ * Uses Interrupts for the state changes
  * States:
  * 1) LED off
  * 2) LED on
@@ -26,6 +26,9 @@
 
 int b = 1;  // cyclic switch variable; gets raised by 1 everytime the button is pressed (and back to 1 at the end); needs to be global, so that it can be changed by the interrupt!
 
+#define LED_ON		PORTB |= (1 << 2)
+#define LED_OFF		PORTB &= ~(1 << 2)
+
 
 static void led_init(void)
 {
@@ -44,15 +47,22 @@ static void button_init(void)
 }
 
 
-void led_on(void)
+void PWM_init(void)		// Use Timer1 as this one can be used for 
 {
-	PORTB |= (1 << 2);
+	TCCR1B |= (1 << WGM12);		// CTC timer mode
+	TIMSK1 |= (1 << OCIE1A) | (1 << OCIE1B);	// Output compare values
+	OCR1A = 800;
+	OCR1B = 100;	// Changing the two values changes duty cycle!
 }
 
 
-void led_off(void)
+void fading_init(uint8_t milliS)	// Use Timer0 for changing the duty cycle
 {
-	PORTB &= ~(1 << 2);
+	TCCR0A |= (1 << WGM01);	// set to CTC mode
+	// =milliS*7.8125-1    works out with formular from video with pre-scalar = 1024
+	OCR0A =	milliS*7.8125-1;		// changes the top value
+	
+	TIMSK0 |= (1 << OCIE0A);	// enable interrupt
 }
 
 
@@ -70,12 +80,11 @@ void led_blink_250ms(void)
 }
 
 
-void led_dim(void)	// TO_DO (probably with timer and/or PWM)
+void led_dim(void)
 {
-	PORTB ^= (1 << 2); // changes state of bit
-	_delay_ms(100);
+	TCCR1B |= (1 << CS10);	// starts PWM (with timer with no pre-scalar)
+	TCCR0B |= (1 << CS02) | (1 << CS00);	// starts fading Timer; sets pre-scalar to 1024
 }
-
 
 ISR(PCINT0_vect) /* pin change interrupt service routine */
 {
@@ -87,11 +96,41 @@ ISR(PCINT0_vect) /* pin change interrupt service routine */
 }
 
 
+ISR(TIMER1_COMPA_vect)	// Timer1 used for PWM
+{
+	LED_ON;
+}
+
+
+ISR(TIMER1_COMPB_vect)	// Timer1 used for PWM
+{
+	LED_OFF;
+}
+
+
+ISR(TIMER0_COMPA_vect)	// Timer0 for fading (changing duty cycle)
+{
+	uint16_t period = OCR1A;
+	uint16_t duty = OCR1B;
+	
+	if (duty < period)
+	{
+		duty++;
+	} 
+	else
+	{
+		duty = 0;
+	}
+	OCR1B = duty;
+}
+
 
 int main(void)
 {
 	led_init();
 	button_init();
+	PWM_init();
+	fading_init(2);	// wait 2ms for each step (up to 800 --> ~1.6s in total)
 	sei();	// enables interrupts globally
 	
 	int number_of_states = 5;
@@ -106,11 +145,12 @@ int main(void)
 		switch (b)		// Main switch routine that selects the different states of the FSM
 		{
 			case 1:
-			led_off();
+			TCCR1B &= ~(1 << CS10);	// stops timer!
+			LED_OFF;
 			break;
 			
 			case 2:
-			led_on();		// Could add an additional if to only execute led_on() if the LED is OFF.
+			LED_ON;		// Could add an additional if to only execute led_on() if the LED is OFF.
 			break;
 			
 			case 3:
@@ -122,11 +162,11 @@ int main(void)
 			break;
 			
 			case 5:
-			led_dim();	// TO_DO
+			led_dim();
 			break;
 			
 			default:
-			led_off();
+			LED_OFF;
 			b = 1;
 			break;
 		}
