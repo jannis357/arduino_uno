@@ -5,7 +5,8 @@
  * Author : Jan
  *
  * Simple cyclic finite state machine (FSM) with an LED
- * Uses a timer in the main routine
+ * UNFINISHED!! My button service routine cannot be used effectively together with the _delay_ms() function! (One has to press the button long enough to toggle to the next state)
+ * --> Implementation with Interrupt seems better, see finite_state_machine.c file!
  * States:
  * 1) LED off
  * 2) LED on
