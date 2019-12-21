@@ -47,12 +47,12 @@ static void button_init(void)
 }
 
 
-void PWM_init(void)		// Use Timer1 as this one can be used for 
+void PWM_init(void)		// Use Timer1 as this one can be used for my used Pin
 {
 	TCCR1B |= (1 << WGM12);		// CTC timer mode
 	TIMSK1 |= (1 << OCIE1A) | (1 << OCIE1B);	// Output compare values
 	OCR1A = 800;
-	OCR1B = 100;	// Changing the two values changes duty cycle!
+	OCR1B = 0;	// Changing the two values changes duty cycle!
 }
 
 
@@ -145,7 +145,9 @@ int main(void)
 		switch (b)		// Main switch routine that selects the different states of the FSM
 		{
 			case 1:
-			TCCR1B &= ~(1 << CS10);	// stops timer!
+			TCCR1B &= ~(1 << CS10);	// stops timer1!
+			TCCR0B &= ~(1 << CS02);	// stops timer0!
+			TCCR0B &= ~(1 << CS00);
 			LED_OFF;
 			break;
 			
@@ -167,6 +169,9 @@ int main(void)
 			
 			default:
 			LED_OFF;
+			TCCR1B &= ~(1 << CS10);	// stops timer1!
+			TCCR0B &= ~(1 << CS02);	// stops timer0!
+			TCCR0B &= ~(1 << CS00);
 			b = 1;
 			break;
 		}
