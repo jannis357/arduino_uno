@@ -13,4 +13,4 @@ led_with_switch_2a --> same but with XOR switch
 led_with_switch_2b --> same but without interrupt (button service routine in main function)
 
 finite_state machine --> FSM with different LED options (with interrupt to toggle between states); Use this version
-finite_state_machine --> Archived FSM without interrupts (button service routine in main); Do not use anymore!
+finite_state_machine_2 --> Archived FSM without interrupts (button service routine in main); Do not use anymore!
